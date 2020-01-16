@@ -7,6 +7,7 @@
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       width: 100%;
       text-align: center;
+      color: #06030c;
     }
 
     table {
@@ -29,15 +30,18 @@
     }
 
     .node:hover {
-      fill: rgb(184, 32, 37);
       font-size: 16px;
-      font-weight: 700;
     }
 
     .link {
       stroke-opacity: 0.5;
       fill: none;
       pointer-events: none;
+    }
+
+    .node-selected {
+      font-size: 16px;
+      font-weight: 700;
     }
 
     .node-relation {
@@ -167,10 +171,15 @@
         ];
 
         var relation = [];
+        var artist = [];
         for (var i = 0; i < total.length; i++) {
             if (relation[total[i].artist] == undefined) {
                 relation[total[i].artist] = [];
             }
+            if (artist[total[i].artist] == undefined) {
+                artist[total[i].artist] = 0;
+            }
+            artist[total[i].artist] = artist[total[i].artist] + 1;
             for (var j = 0; j < total.length; j++) {
                 if (total[i].date == total[j].date && total[i].time == total[j].time && total[i].city == total[j].city && total[i].title == total[j].title) {
                     var count = 0;
@@ -262,7 +271,7 @@
             .enter().append("text")
             .attr("class", "node")
             .attr("dy", "0.31em")
-            .attr("fill", "#000")
+            .attr("fill", "#06030c")
             .attr("transform", function(d) {
                 return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)");
             })
@@ -272,9 +281,9 @@
             .text(function(d) {
                 return d.data.key;
             })
-            .on("click", clicked)
-            .on("mouseover", mouseovered)
-            .on("mouseout", mouseouted);
+            .on("click", clicked);
+            //.on("mouseover", mouseovered)
+            //.on("mouseout", mouseouted);
 
         var linear = d3.scaleLinear()
             .domain([mindata, maxdata])
@@ -285,8 +294,15 @@
 
         var color = d3.interpolate(a, b);
 
+        var clicked = undefined;
         function clicked(d) {
-            mouseovered(d);
+            if (clicked == d) {
+                clicked = undefined;
+                mouseouted(d);
+            } else {
+                clicked = d;
+                mouseovered(d);
+            }
         }
 
         function mouseovered(d) {
@@ -327,18 +343,25 @@
                     }
                 });
 
+
             node
+                .classed("node-selected", function(n) {
+                   return n == d;
+                })
                 .classed("node-relation", function(n) {
                     return n.target || n.source;
                 })
                 .attr("fill", function(l, i) {
+                    if (l == d) {
+                        return "rgb(184, 32, 37)";
+                    }
                     if (relation[d.data.key] != undefined) {
                         if (relation[d.data.key][l.data.key] != undefined) {
                             var col = color(linear(relation[d.data.key][l.data.key]));
                             return col.toString();
                         }
                     }
-                    return "#000";
+                    return "#06030c";
                 });
 
             var table = document.getElementsByTagName("table")[0];
@@ -404,9 +427,12 @@
                 .attr("stroke", "rgb(245, 245, 245)");
 
             node
+                .classed("node-selected", false)
                 .classed("node-relation", false)
-                .attr("fill", "#000");
+                .attr("fill", "#06030c");
 
+            var table = document.getElementsByTagName("table")[0];
+            table.innerHTML = "";
         }
 
         function packageHierarchy(classes) {
