@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      width: 100%;
+      text-align: center;
+    }
+
+    table {
+      margin-left: auto;
+      margin-right: auto;
+      width: 200px;
+    }
+
+    table tr {
+      line-height: 30px;
+    }
+
+    table, th, td {
+      border-bottom: 1px solid gainsboro;
+    }
+
+    .node {
+      font: 300 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+      cursor: pointer;
+    }
+
+    .node:hover {
+      fill: rgb(184, 32, 37);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .link {
+      stroke-opacity: 0.5;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .node-relation {
+      font-weight: 500;
+    }
+
+    .link-relation {
+      stroke-opacity: 1;
+    }
+
+    </style>
+
+    <script src="src/d3.v4.min.js"></script>
+    <script src="src/topojson.v2.min.js"></script>
+    <script src="src/jquery-1.12.1.min.js"></script>
+
+    <script>
+    d3.csv("data/bundle.csv", function(total) {
+        var nodes = [{
+                "name": "声入人心.阿云嘎演唱组.阿云嘎"
+            },
+            {
+                "name": "声入人心.阿云嘎演唱组.方书剑"
+            },
+            {
+                "name": "声入人心.阿云嘎演唱组.黄子弘凡"
+            },
+            {
+                "name": "声入人心.阿云嘎演唱组.梁朋杰"
+            },
+            {
+                "name": "声入人心.阿云嘎演唱组.张超"
+            },
+            {
+                "name": "声入人心.阿云嘎演唱组.郑云龙"
+            },
+            {
+                "name": "声入人心.洪之光演唱组.洪之光"
+            },
+            {
+                "name": "声入人心.洪之光演唱组.陈博豪"
+            },
+            {
+                "name": "声入人心.洪之光演唱组.鞠红川"
+            },
+            {
+                "name": "声入人心.洪之光演唱组.廖佳琳"
+            },
+            {
+                "name": "声入人心.洪之光演唱组.南枫"
+            },
+            {
+                "name": "声入人心.洪之光演唱组.石凯"
+            },
+            {
+                "name": "声入人心.高天鹤演唱组.高天鹤"
+            },
+            {
+                "name": "声入人心.高天鹤演唱组.代玮"
+            },
+            {
+                "name": "声入人心.高天鹤演唱组.金天泽"
+            },
+            {
+                "name": "声入人心.高天鹤演唱组.李彦锋"
+            },
+            {
+                "name": "声入人心.高天鹤演唱组.马佳"
+            },
+            {
+                "name": "声入人心.高天鹤演唱组.仝卓"
+            },
+            {
+                "name": "声入人心.蔡程昱演唱组.陆宇鹏"
+            },
+            {
+                "name": "声入人心.蔡程昱演唱组.李琦"
+            },
+            {
+                "name": "声入人心.蔡程昱演唱组.贾凡"
+            },
+            {
+                "name": "声入人心.蔡程昱演唱组.高杨"
+            },
+            {
+                "name": "声入人心.蔡程昱演唱组.丁辉"
+            },
+            {
+                "name": "声入人心.蔡程昱演唱组.蔡程昱"
+            },
+            {
+                "name": "声入人心.王晰演唱组.周深"
+            },
+            {
+                "name": "声入人心.王晰演唱组.刘彬濠"
+            },
+            {
+                "name": "声入人心.王晰演唱组.李向哲"
+            },
+            {
+                "name": "声入人心.王晰演唱组.金圣权"
+            },
+            {
+                "name": "声入人心.王晰演唱组.蔡尧"
+            },
+            {
+                "name": "声入人心.王晰演唱组.王晰"
+            },
+            {
+                "name": "声入人心.余笛演唱组.翟李朔天"
+            },
+            {
+                "name": "声入人心.余笛演唱组.王凯"
+            },
+            {
+                "name": "声入人心.余笛演唱组.李文豹"
+            },
+            {
+                "name": "声入人心.余笛演唱组.简弘亦"
+            },
+            {
+                "name": "声入人心.余笛演唱组.龚子棋"
+            },
+            {
+                "name": "声入人心.余笛演唱组.余笛"
+            }
+        ];
+
+        var relation = [];
+        for (var i = 0; i < total.length; i++) {
+            if (relation[total[i].artist] == undefined) {
+                relation[total[i].artist] = [];
+            }
+            for (var j = 0; j < total.length; j++) {
+                if (total[i].date == total[j].date && total[i].time == total[j].time && total[i].city == total[j].city && total[i].title == total[j].title) {
+                    var count = 0;
+                    if (relation[total[i].artist][total[j].artist] != undefined) {
+                        count = relation[total[i].artist][total[j].artist];
+                    }
+                    count = count + 1;
+                    relation[total[i].artist][total[j].artist] = count;
+                }
+            }
+        }
+
+        var mindata = 0;
+        var maxdata = 0;
+        var classes = new Array();
+        for (var i = 0; i < nodes.length; i++) {
+            var objTemp = {};
+            objTemp["name"] = nodes[i].name;
+            objTemp["size"] = 1;
+            objTemp["relation"] = [];
+            var nameShort = nodes[i].name.substring(nodes[i].name.lastIndexOf(".") + 1, nodes[i].name.length);
+            if (relation[nameShort] != undefined) {
+                for (var j = 0; j < nodes.length; j++) {
+                    var nameShortTemp = nodes[j].name.substring(nodes[j].name.lastIndexOf(".") + 1, nodes[j].name.length);
+                    if (nameShort != nameShortTemp && relation[nameShort][nameShortTemp] != undefined) {
+                        console.log(nameShort + ", " + nameShortTemp + ": " + relation[nameShort][nameShortTemp]);
+                        var exist = false;
+                        for (var k = 0; k < classes.length; k++) {
+                            if (classes[k].name == nodes[j].name && classes[k].relation.includes(nodes[i].name)) {
+                                var exist = true;
+                            }
+                        }
+                        if (!exist && relation[nameShort][nameShortTemp] > 0) {
+                            objTemp["relation"].push(nodes[j].name);
+                            maxdata = maxdata > relation[nameShort][nameShortTemp] ? maxdata : relation[nameShort][nameShortTemp];
+                        }
+                    }
+                }
+            }
+            classes.push(objTemp);
+        }
+
+        var diameter = 1000,
+            radius = diameter / 2,
+            innerRadius = radius - 120;
+
+        var cluster = d3.cluster()
+            .size([360, innerRadius]);
+
+        var line = d3.radialLine()
+            .curve(d3.curveBundle.beta(0.85))
+            .radius(function(d) {
+                return d.y;
+            })
+            .angle(function(d) {
+                return d.x / 180 * Math.PI;
+            });
+
+        var svg = d3.select("svg")
+            .attr("width", diameter)
+            .attr("height", diameter)
+            .append("g")
+            .attr("transform", "translate(" + radius + "," + radius + ")");
+
+        var link = svg.append("g").selectAll(".link"),
+            node = svg.append("g").selectAll(".node");
+
+        var root = packageHierarchy(classes)
+            .sum(function(d) {
+                return d.size;
+            });
+
+        cluster(root);
+
+        link = link
+            .data(packageImports(root.leaves()))
+            .enter().append("path")
+            .each(function(d) {
+                d.source = d[0], d.target = d[d.length - 1];
+            })
+            .attr("class", "link")
+            .attr("d", line)
+            .attr("stroke-width", function(d) {
+                return relation[d.source.data.key][d.target.data.key];
+            })
+            .attr("stroke", "rgb(245, 245, 245)");
+
+        node = node
+            .data(root.leaves())
+            .enter().append("text")
+            .attr("class", "node")
+            .attr("dy", "0.31em")
+            .attr("fill", "#000")
+            .attr("transform", function(d) {
+                return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)");
+            })
+            .attr("text-anchor", function(d) {
+                return d.x < 180 ? "start" : "end";
+            })
+            .text(function(d) {
+                return d.data.key;
+            })
+            .on("click", clicked)
+            .on("mouseover", mouseovered)
+            .on("mouseout", mouseouted);
+
+        var linear = d3.scaleLinear()
+            .domain([mindata, maxdata])
+            .range([0, 1]);
+
+        var b = d3.rgb(184, 32, 37);
+        var a = d3.rgb(255, 238, 168);
+
+        var color = d3.interpolate(a, b);
+
+        function clicked(d) {
+            mouseovered(d);
+        }
+
+        function mouseovered(d) {
+            node
+                .each(function(n) {
+                    n.target = n.source = false;
+                });
+
+            link
+                .classed("link-relation", function(l) {
+                    if (l.target === d) {
+                        return l.source.source = true;
+                    } else if (l.source === d) {
+                        return l.target.target = true;
+                    }
+                    return false;
+                })
+                .sort(function(a, b) {
+                    if (a.target === d || a.source === d) {
+                        if (b.target === d || b.source === d) {
+                            if (relation[a.source.data.key][a.target.data.key] > relation[b.source.data.key][b.target.data.key]) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        }
+                        return 1;
+                    } else {
+                        return -1;
+                    };
+                })
+                .attr("stroke", function(l, i) {
+                    if (l.target === d || l.source === d) {
+                        var col = color(linear(relation[l.source.data.key][l.target.data.key]));
+                        return col.toString();
+                    } else {
+                        return "rgb(245, 245, 245)";
+                    }
+                });
+
+            node
+                .classed("node-relation", function(n) {
+                    return n.target || n.source;
+                })
+                .attr("fill", function(l, i) {
+                    if (relation[d.data.key] != undefined) {
+                        if (relation[d.data.key][l.data.key] != undefined) {
+                            var col = color(linear(relation[d.data.key][l.data.key]));
+                            return col.toString();
+                        }
+                    }
+                    return "#000";
+                });
+
+            var table = document.getElementsByTagName("table")[0];
+            table.innerHTML = "";
+
+            var header_one = table.insertRow(0)
+            var member = header_one.insertCell(0);
+            member.colSpan = 2;
+            member.innerHTML = "<b>" + d.data.key + "</b>";
+
+            var header_two = table.insertRow(1);
+            header_two.insertCell(0).innerHTML = "成员";
+            header_two.insertCell(1).innerHTML = "场次";
+
+            var list = [];
+            for (var i = 0; i < nodes.length; i++) {
+                var nameShort = nodes[i].name.substring(nodes[i].name.lastIndexOf(".") + 1, nodes[i].name.length);
+                if (relation[nameShort] != undefined) {
+                    for (var j = 0; j < nodes.length; j++) {
+                        var nameShortTemp = nodes[j].name.substring(nodes[j].name.lastIndexOf(".") + 1, nodes[j].name.length);
+                        if (nameShort != nameShortTemp && relation[nameShort][nameShortTemp] != undefined) {
+                            if (nameShort == d.data.key || nameShortTemp == d.data.key) {
+                                var name = nameShort == d.data.key ? nameShortTemp : nameShort;
+                                var exist = false;
+                                for (var k = 0; k < list.length; k++) {
+                                    if (list[k].name == name) {
+                                        exist = true;
+                                    }
+                                }
+                                if (!exist) {
+                                    list.push({
+                                        "name": name,
+                                        "count": relation[nameShort][nameShortTemp]
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            list.sort(function(a, b) {
+                if (a.count > b.count) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            });
+
+            for (var i = 0; i < list.length; i++) {
+                var row = table.insertRow(2 + i);
+
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+
+                cell1.innerHTML = list[i].name;
+                cell2.innerHTML = list[i].count;
+            }
+        }
+
+        function mouseouted(d) {
+            link
+                .classed("link-relation", false)
+                .attr("stroke", "rgb(245, 245, 245)");
+
+            node
+                .classed("node-relation", false)
+                .attr("fill", "#000");
+
+        }
+
+        function packageHierarchy(classes) {
+            var map = {};
+
+            function find(name, data) {
+                var node = map[name],
+                    i;
+                if (!node) {
+                    node = map[name] = data || {
+                        name: name,
+                        children: []
+                    };
+                    if (name.length) {
+                        node.parent = find(name.substring(0, i = name.lastIndexOf(".")));
+                        node.parent.children.push(node);
+                        node.key = name.substring(i + 1);
+                    }
+                }
+                return node;
+            }
+
+            classes.forEach(function(d) {
+                find(d.name, d);
+            });
+
+            return d3.hierarchy(map[""]);
+        }
+
+        function packageImports(nodes) {
+            var map = {},
+                relation = [];
+
+            nodes.forEach(function(d) {
+                map[d.data.name] = d;
+            });
+
+            nodes.forEach(function(d) {
+                if (d.data.relation) d.data.relation.forEach(function(i) {
+                    relation.push(map[d.data.name].path(map[i]));
+                });
+            });
+
+            return relation;
+        }
+
+    });
+    </script>
+</head>
+<body>
+    <h2>2019年梅溪湖年终盘点番外篇</h2>
+    <h3>音乐会/演唱会/舞台剧同台频率</h3>
+    <svg></svg>
+    <table></table>
+</body>
+</html>
