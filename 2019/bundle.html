@@ -196,7 +196,6 @@
                 for (var j = 0; j < nodes.length; j++) {
                     var nameShortTemp = nodes[j].name.substring(nodes[j].name.lastIndexOf(".") + 1, nodes[j].name.length);
                     if (nameShort != nameShortTemp && relation[nameShort][nameShortTemp] != undefined) {
-                        console.log(nameShort + ", " + nameShortTemp + ": " + relation[nameShort][nameShortTemp]);
                         var exist = false;
                         for (var k = 0; k < classes.length; k++) {
                             if (classes[k].name == nodes[j].name && classes[k].relation.includes(nodes[i].name)) {
