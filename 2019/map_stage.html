@@ -5,11 +5,11 @@
     <style>
 
     body {
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      width: 100%;
-      text-align: center;
-      color: #06030c;
-      min-width: 1200px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        width: 100%;
+        text-align: center;
+        color: #06030c;
+        min-width: 1200px;
     }
 
     .state-borders {
@@ -19,6 +19,10 @@
         stroke-linejoin: round;
         stroke-linecap: round;
         pointer-events: none;
+    }
+
+    div.notes {
+        font-size: 10px;
     }
 
     div.tooltip {
@@ -45,17 +49,17 @@
     }
 
     table {
-      margin-left: auto;
-      margin-right: auto;
-      width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 600px;
     }
 
     table tr {
-      line-height: 30px;
+        line-height: 30px;
     }
 
     table, th, td {
-      border-bottom: 1px solid gainsboro;
+        border-bottom: 1px solid gainsboro;
     }
 
     table td:first-child {
@@ -76,10 +80,13 @@
 
 </head>
 <body>
-<h2>2019年梅溪湖年终盘点</h2>
-<h3>剧目演出足迹</h3>
-<svg></svg>
-<table></table>
+    <h2>2019年梅溪湖年终盘点</h2>
+    <h3>剧目演出足迹</h3>
+    <div class="notes">足迹地图加载可能有点慢(｡ ́︿ ̀｡)</div>
+    <div class="notes">不要着急，休息、休息一会......</div>
+
+    <svg></svg>
+    <table></table>
 
 <script>
     d3.json("data/china.json", function(error, us) {
