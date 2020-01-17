@@ -34,13 +34,13 @@
 
     div.state{
         font-size: 16px;
-        color: rgb(143, 101, 138);
+        color: rgb(114, 62, 17);
         font-weight: 500;
     }
 
     div.count{
         font-size: 12px;
-        color: rgb(143, 101, 138);
+        color: rgb(114, 62, 17);
     }
 
     table {
@@ -291,6 +291,7 @@
                     return a !== b;
                 })));
 
+            var clicked = undefined;
             svg.selectAll("circle")
                 .data(us.features)
                 .enter()
@@ -350,8 +351,10 @@
                         .style("opacity", 0.9);
                     var transform = d3.select(this).attr("transform");
                     transform = transform.split("(")[1].split(")")[0];
-                    var x = parseFloat(transform.split(",")[0]) + parseFloat(d3.select(this).attr("r"));
+                    var x = window.innerWidth > width ? (window.innerWidth - width)/2 : 0
+                    x = x + parseFloat(transform.split(",")[0]) + parseFloat(d3.select(this).attr("r"));
                     var y = parseFloat(transform.split(",")[1]) + 95;
+
                     div.html("<div class='state'>" + d.properties.name + "</div>" + "<div class='count'>" + datas[d.properties.name] + "场" + "</div>")
                         .style("left", x + "px")
                         .style("top", y + "px");
@@ -365,42 +368,44 @@
                     div.html("");
                 })
                 .on("click", function(d) {
-                    console.log(d);
-
                     var table = document.getElementsByTagName("table")[0];
                     table.innerHTML = "";
 
-                    var header_one = table.insertRow(0)
-                    var member = header_one.insertCell(0);
-                    member.colSpan = 3;
-                    member.innerHTML = "<b>" + d.properties.name + "</b>";
+                    if (clicked == undefined || clicked != d.properties.name) {
+                        clicked = d.properties.name;
 
-                    var header_two = table.insertRow(1);
-                    header_two.insertCell(0).innerHTML = "日期";
-                    header_two.insertCell(1).innerHTML = "城市";
-                    header_two.insertCell(2).innerHTML = "音乐会/演唱会";
+                        var header_one = table.insertRow(0)
+                        var member = header_one.insertCell(0);
+                        member.colSpan = 3;
+                        member.innerHTML = "<b>" + d.properties.name + "</b>";
 
-                    var list = sum[d.properties.name];
-                    console.log(list);
+                        var header_two = table.insertRow(1);
+                        header_two.insertCell(0).innerHTML = "日期";
+                        header_two.insertCell(1).innerHTML = "城市";
+                        header_two.insertCell(2).innerHTML = "音乐会/演唱会";
 
-                    list.sort(function(a, b) {
-                        if (a.date > b.date) {
-                            return 1;
-                        } else {
-                            return -1;
+                        var list = sum[d.properties.name];
+                        list.sort(function(a, b) {
+                            if (a.date > b.date) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
+
+                        for (var i = 0; i < list.length; i++) {
+                            var row = table.insertRow(2 + i);
+
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+
+                            cell1.innerHTML = list[i].date;
+                            cell2.innerHTML = list[i].city;
+                            cell3.innerHTML = list[i].title;
                         }
-                    });
-
-                    for (var i = 0; i < list.length; i++) {
-                        var row = table.insertRow(2 + i);
-
-                        var cell1 = row.insertCell(0);
-                        var cell2 = row.insertCell(1);
-                        var cell3 = row.insertCell(2);
-
-                        cell1.innerHTML = list[i].date;
-                        cell2.innerHTML = list[i].city;
-                        cell3.innerHTML = list[i].title;
+                    } else {
+                        clicked = undefined;
                     }
 
                 });
