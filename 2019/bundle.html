@@ -8,6 +8,7 @@
       width: 100%;
       text-align: center;
       color: #06030c;
+      min-width: 1000px;
     }
 
     table {
@@ -57,6 +58,15 @@
     <script src="src/d3.v4.min.js"></script>
     <script src="src/topojson.v2.min.js"></script>
     <script src="src/jquery-1.12.1.min.js"></script>
+
+    <title>2019年梅溪湖年终盘点番外篇</title>
+
+</head>
+<body>
+    <h2>2019年梅溪湖年终盘点番外篇</h2>
+    <h3>音乐会/演唱会/剧目演出同台频率</h3>
+    <svg></svg>
+    <table></table>
 
     <script>
     d3.csv("data/bundle.csv", function(total) {
@@ -282,8 +292,8 @@
                 return d.data.key;
             })
             .on("click", clicked);
-            //.on("mouseover", mouseovered)
-            //.on("mouseout", mouseouted);
+        //.on("mouseover", mouseovered)
+        //.on("mouseout", mouseouted);
 
         var linear = d3.scaleLinear()
             .domain([mindata, maxdata])
@@ -295,6 +305,7 @@
         var color = d3.interpolate(a, b);
 
         var clicked = undefined;
+
         function clicked(d) {
             if (clicked == d) {
                 clicked = undefined;
@@ -346,7 +357,7 @@
 
             node
                 .classed("node-selected", function(n) {
-                   return n == d;
+                    return n == d;
                 })
                 .classed("node-relation", function(n) {
                     return n.target || n.source;
@@ -481,14 +492,5 @@
 
     });
     </script>
-
-    <title>2019年梅溪湖年终盘点番外篇</title>
-
-</head>
-<body>
-    <h2>2019年梅溪湖年终盘点番外篇</h2>
-    <h3>音乐会/演唱会/舞台剧同台频率</h3>
-    <svg></svg>
-    <table></table>
 </body>
 </html>
