@@ -363,7 +363,7 @@
                     transform = transform.split("(")[1].split(")")[0];
                     var x = window.innerWidth > width ? (window.innerWidth - width)/2 : 0
                     x = x + parseFloat(transform.split(",")[0]) + parseFloat(d3.select(this).attr("r"));
-                    var y = parseFloat(transform.split(",")[1]) + 95;
+                    var y = parseFloat(transform.split(",")[1]) + 125;
 
                     div.html("<div class='state'>" + d.properties.name + "</div>" + "<div class='count'>" + datas[d.properties.name] + "场" + "</div>")
                         .style("left", x + "px")
