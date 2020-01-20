@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+
+    .state-borders {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 0.5px;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        pointer-events: none;
+    }
+
+    </style>
+    <svg width="1800" height="1800" style="border:1px gainsboro solid; padding-left: 10px;"></svg>
+    <script src="src/d3.v4.min.js"></script>
+    <script src="src/topojson.v2.min.js"></script>
+    <script src="src/jquery-1.12.1.min.js"></script>
+
+    <script>
+    d3.csv("data/bundle.csv", function(total) {
+
+        var relation = [];
+        for (var i = 0; i < total.length; i++) {
+            if (relation[total[i].artist] == undefined) {
+                relation[total[i].artist] = [];
+            }
+            for (var j = 0; j < total.length; j++) {
+                if (total[i].date == total[j].date && total[i].time == total[j].time && total[i].city == total[j].city && total[i].title == total[j].title) {
+                    var count = 0;
+                    if (relation[total[i].artist][total[j].artist] != undefined) {
+                        count = relation[total[i].artist][total[j].artist];
+                    }
+                    count = count + 1;
+                    relation[total[i].artist][total[j].artist] = count;
+                }
+            }
+        }
+
+        var nodes = [{
+                "name": "贾凡"
+            },
+            {
+                "name": "方书剑"
+            },
+            {
+                "name": "高杨"
+            },
+            {
+                "name": "黄子弘凡"
+            },
+            {
+                "name": "金圣权"
+            },
+            {
+                "name": "鞠红川"
+            },
+            {
+                "name": "蔡程昱"
+            },
+            {
+                "name": "阿云嘎"
+            },
+            {
+                "name": "陈博豪"
+            },
+            {
+                "name": "王晰"
+            },
+            {
+                "name": "龚子棋"
+            },
+            {
+                "name": "马佳"
+            },
+            {
+                "name": "简弘亦"
+            },
+            {
+                "name": "张超"
+            },
+            {
+                "name": "蔡尧"
+            },
+            {
+                "name": "高天鹤"
+            },
+            {
+                "name": "金天泽"
+            },
+            {
+                "name": "李向哲"
+            },
+            {
+                "name": "翟李朔天"
+            },
+            {
+                "name": "王凯"
+            },
+            {
+                "name": "郑云龙"
+            },
+            {
+                "name": "洪之光"
+            },
+            {
+                "name": "李文豹"
+            },
+            {
+                "name": "廖佳琳"
+            },
+            {
+                "name": "南枫"
+            },
+            {
+                "name": "周深"
+            },
+            {
+                "name": "余笛"
+            },
+            {
+                "name": "梁朋杰"
+            },
+            {
+                "name": "仝卓"
+            },
+            {
+                "name": "李彦锋"
+            },
+            {
+                "name": "刘彬濠"
+            },
+            {
+                "name": "李琦"
+            },
+            {
+                "name": "代玮"
+            },
+            {
+                "name": "石凯"
+            },
+            {
+                "name": "陆宇鹏"
+            },
+            {
+                "name": "丁辉"
+            }
+        ];
+
+        var edges = new Array();
+        for (var i = 0; i < nodes.length; i++) {
+            if (relation[nodes[i].name] != undefined) {
+                for (var j = 0; j < nodes.length; j++) {
+                    if (nodes[i].name != nodes[j].name && relation[nodes[i].name][nodes[j].name] != undefined) {
+                        var exist = false;
+                        for (var k = 0; k < edges.length; k++) {
+                            if ((edges[k].source == nodes[i].name && edges[k].target == nodes[j].name) || (edges[k].source == nodes[j].name && edges[k].target == nodes[i].name)) {
+                                var exist = true;
+                            }
+                        }
+                        if (!exist && relation[nodes[i].name][nodes[j].name] > 0) {
+                            edges.push({
+                                "source": i,
+                                "target": j,
+                                "relation": relation[nodes[i].name][nodes[j].name]
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        var json = {
+            "nodes": nodes,
+            "links": edges
+        };
+
+        var svg = d3.select("svg"),
+            width = svg.attr("width"),
+            height = svg.attr("height");
+
+        var force = d3.forceSimulation()
+            .force("charge", d3.forceManyBody().strength(-3000).distanceMin(100).distanceMax(1000))
+            .force("link", d3.forceLink().id(function(d) {
+                return d.index
+            }))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("y", d3.forceY(0.001))
+            .force("x", d3.forceX(0.001))
+
+        function dragstarted(d) {
+            if (!d3.event.active) force.alphaTarget(0.5).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) force.alphaTarget(0.5);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        force
+            .nodes(json.nodes)
+            .force("link").links(json.links)
+
+        var link = svg.selectAll(".link")
+            .data(json.links)
+            .enter()
+            .append("line")
+            .attr("stroke", "rgb(243, 173, 115)")
+            .attr("stroke-width", function(d) {
+                return d.relation;
+            });
+
+        var node = svg.selectAll(".node")
+            .data(json.nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        node.append('circle')
+            .attr('r', 22)
+            .attr('fill', "rgb(255, 235, 192)");
+
+        node.append("text")
+            .attr("dx", function(d) {
+                if (d.name.length == 2) {
+                    return -10;
+                } else if (d.name.length == 3) {
+                    return -15;
+                } else if (d.name.length == 4) {
+                    return -20;
+                }
+            })
+            .attr("dy", 5)
+            .style("font-family", "overwatch")
+            .style("font-size", "10px")
+            .style("font-color", "rgb(255, 255, 255)")
+            .style("text-align", "center")
+            .text(function(d) {
+                return d.name
+            });
+
+        force.on("tick", function() {
+            link.attr("x1", function(d) {
+                    return d.source.x;
+                })
+                .attr("y1", function(d) {
+                    return d.source.y;
+                })
+                .attr("x2", function(d) {
+                    return d.target.x;
+                })
+                .attr("y2", function(d) {
+                    return d.target.y;
+                });
+            node.attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+        });
+
+    });
+    </script>
+</head>
+<body>
+
+</body>
+</html>
