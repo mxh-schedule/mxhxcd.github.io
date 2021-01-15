@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      width: 100%;
+      text-align: center;
+      line-height: 30px;
+      color: #06030c;
+    }
+
+    ul {
+      width: 300px;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      list-style-type: none;
+    }
+
+    ul li:before {
+      content: "";
+      display: inline-block;
+      height: 12px;
+      width: 12px;
+      background-size: 12px;
+      background-image: url("images/star.png");
+      background-repeat: no-repeat;
+      margin-right: 5px;
+    }
+
+    a {
+      color: #06030c;
+    }
+
+    .new-label {
+        display: inline-block;
+        color: red;
+        margin-left: 5px;
+        font-style: oblique;
+        font-weight: 500;
+    }
+    </style>
+
+    <script src="src/d3.v4.min.js"></script>
+    <script src="src/topojson.v2.min.js"></script>
+    <script src="src/jquery-1.12.1.min.js"></script>
+
+    <title>2020年梅溪湖年终盘点</title>
+</head>
+<body>
+    <h2>2020年梅溪湖年终盘点</h2>
+    <ul>
+        <li><a href="map_concert.html">年终盘点 · 音乐会/演唱会足迹</a></li>
+        <li><a href="map_stage.html">年终盘点 · 剧目演出足迹</a></li>
+    </ul>
+</body>
+</html>
